@@ -1,0 +1,7 @@
+Options -Indexes
+
+#Options +FollowSymlinks  
+#RewriteEngine On  
+#RewriteCond %{REQUEST_URI} !/mantenimiento.php$  
+#RewriteCond %{REMOTE_HOST} !^999\.999\.999\.999  
+#RewriteRule $ /mantenimiento.php [R=302,L]  

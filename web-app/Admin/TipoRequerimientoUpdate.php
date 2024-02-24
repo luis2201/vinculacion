@@ -1,0 +1,102 @@
+<?php 
+  
+  $peticionAjax = false;
+
+  session_start(['name' => 'VIN']);    
+  if(!isset($_SESSION['usuario_vin'])){
+    header('Location: ../Login/');
+  } else{
+    switch($_SESSION['tipo_vin']){            
+      case 'COORDINADOR':
+        header('Location: ../Coordinador');        
+        break;
+      case 'TUTOR':
+        header('Location: ../Tutor');
+        break;
+      case 'ESTUDIANTE':
+        header('Location: ../Estudiante');
+        break;
+    }
+  }
+
+  include '../../config/routes.php';
+  include '../layout/head.php';
+  include '../layout/nav.php';
+  include 'sidebar.php'; 
+
+?>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0 text-dark">Actualizar Tipo de Requerimiento</h1>              
+            </div><!-- /.col -->            
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">          
+          <!-- Main row -->
+          <div class="row">
+            <div class="col-sm-8" style="margin: auto;">
+              <div class="card mb-3">
+                <div class="card-header text-right bg-primary" style="padding: 2px;">
+                  <a href="TipoRequerimiento.php"><button type="button" class="btn btn-outline-light btn-sm"><i class="fas fa-backspace"></i> Volver</button></a>
+                </div>
+                <?php 
+                  $result = $tiporequerimiento->view_tiporequerimiento_business();                  
+                  if(count($result)==0){
+                    echo '<script>window.location="TipoRequerimiento.php";</script>';
+                  }
+                  foreach ($result as $row) {
+                ?>
+                <div class="card-body">
+                  <form class="frmAction" action="<?php echo __SERVER__; ?>ajax/updateTipoRequerimientoAjax.php?>" method="POST" data-form="update" enctype="multipart/form-data" autocomplete="off">
+                    <input type="hidden" name="idtipo" id="idtipo" value="<?php echo $tiporequerimiento->encryption($row['idtipo']); ?>">                    
+                    <div class="form-row">
+                      <div class="form-group col-md-12">
+                        <label for="tipo">Requerimiento</label>
+                        <input type="text" name="tipo" id="tipo" class="form-control" placeholder="Requerimiento" value="<?php echo $row['tipo']; ?>">
+                      </div>                      
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-12">
+                        <label for="horas">Equivalencia en Horas</label>
+                        <input type="text" name="horas" id="horas" class="form-control" placeholder="Horas" value="<?php echo $row['horas']; ?>">
+                      </div>                      
+                    </div>
+                    <div class="form-row"> 
+                      <div class="form-group col-md-6">
+                        <button type="submit" id="btnEnviar" class="btn btn-block btn-success"><i class="fas fa-sync"></i> Actualizar</button>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <button type="button" id="btnCancelar" class="btn btn-block btn-warning"><i class="far fa-window-close"></i> Cancelar</button>
+                      </div>
+                    </div>
+                  </form>
+                  <div id="RespuestaForm"></div>
+                </div>
+                <?php } ?>
+              </div>
+            </div>
+          </div>
+          <!-- /.row (main row) -->
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+  <?php require '../layout/footer.php'; ?>
+  <script src="<?php echo __SERVER__.__APP__; ?>tiporequerimiento.js"></script>  
+  <script src="<?php echo __SERVER__.__APP__; ?>main.js"></script>
+</body>
+</html>
+<?php ob_end_flush(); ?>

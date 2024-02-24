@@ -1,0 +1,135 @@
+<?php 
+  
+  $peticionAjax = false;
+
+  session_start(['name' => 'VIN']);    
+  if(!isset($_SESSION['usuario_vin'])){
+    header('Location: ../Login/');
+  } else{
+    switch($_SESSION['tipo_vin']){            
+      case 'COORDINADOR':
+        header('Location: ../Coordinador');        
+        break;
+      case 'TUTOR':
+        header('Location: ../Tutor');
+        break;
+      case 'ESTUDIANTE':
+        header('Location: ../Estudiante');
+        break;
+    }
+  }
+
+  include '../../config/routes.php';
+  include '../layout/head.php';
+  include '../layout/nav.php';
+  include 'sidebar.php'; 
+
+?>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0 text-dark">Estudiante</h1>              
+            </div><!-- /.col -->            
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">          
+          <!-- Main row -->
+          <div class="row">
+            <div class="col-sm-12" style="margin: auto;">
+              <div class="card mb-3">
+                <div class="card-header text-right bg-primary" style="padding: 2px;">
+                  <a href="EstudianteInsert.php"><button type="button" class="btn btn-outline-light btn-sm"><i class="far fa-plus-square"></i> Agregar Estudiante</button></a>
+                </div>
+                <div class="card-body">
+                  <table id="tbLista" class="table table-responsive-sm table-striped table-hover" style="font-size: 12px;">
+                    <thead>
+                      <tr class="text-center">
+                        <th>#</th>                          
+                        <th>Carrera</th>                        
+                        <th>Apellidos</th>
+                        <th>Nombres</th>                        
+                        <th>Tel&eacute;fono</th>                        
+                        <th>Horas</th>
+                        <th>Estado</th>
+                        <th>Acci&oacute;n</th>
+                      </tr>
+                    </thead>                    
+                    <tbody>
+                      <?php 
+                        $i = 1;
+                        $result = $estudiante->consulta_todos_estudiante_business();
+                        foreach($result as $row){ 
+                      ?>
+                      <tr>
+                        <th class="text-center"><?php echo $i++ ?></th>
+                        <th><?php echo $row['carrera'] ?></th>
+                        <th><?php echo $row['apellidos'] ?></th>
+                        <th><?php echo $row['nombres'] ?></th>
+                        <th><?php echo $row['telefono'] ?></th>
+                        <th class="text-center"><?php echo $row['numero_horas'] ?></th>
+                        <th class="text-center">
+                          <?php 
+                            if($row['estado']==1){
+                              echo '<span class="badge badge-success">ACTIVO';
+                            } else{
+                              echo '<span class="badge badge-danger">DESACTIVADO';
+                            }
+                            echo '</span>';
+                          ?>
+                        </th>
+                        <th class="text-center" style="padding:0.5%; width: 130px; margin: auto;">
+                          <div class="row" style="width: 115%">
+                            <div class="col-sm-3" style="padding:0; margin: 0;">
+                              <a href="EstudianteView.php?id=<?php echo $estudiante->encryption($row['idestudiante']); ?>"><button type="button" class="btn btn-sm btn-warning"><i class="far fa-eye"></i></button></a>
+                            </div>
+                            <div class="col-sm-3" style="padding:0; margin: 0;">
+                              <a href="EstudianteUpdate.php?id=<?php echo $estudiante->encryption($row['idestudiante']); ?>"><button type="button" class="btn btn-sm btn-success"><i class="far fa-edit"></i></button></a>
+                            </div>                          
+                            <!-- cambiar estado -->
+                            <div class="col-sm-3" style="padding:0; margin: 0;">
+                              <form class="frmAction" action="<?php echo __SERVER__; ?>ajax/estadoEstudianteAjax.php" method="POST" data-form="estado" enctype="multipart/form-data" autocomplete="off">
+                                <input type="hidden" id="idestudiante" name="idestudiante" value="<?php echo $estudiante->encryption($row['idestudiante']); ?>">
+                                <button type="submit" class="btn btn-sm btn-secondary"><i class="fa fa-retweet"></i></button>
+                              </form>
+                            </div>
+                            <!-- Eliminar registro -->
+                            <div class="col-sm-3" style="padding:0; margin: 0;">
+                              <form class="frmAction" action="<?php echo __SERVER__; ?>ajax/deleteEstudianteAjax.php" method="POST" data-form="delete" enctype="multipart/form-data" autocomplete="off">
+                                <input type="hidden" id="idestudiante" name="idestudiante" value="<?php echo $estudiante->encryption($row['idestudiante']); ?>">
+                                <button type="submit" class="btn btn-sm btn-danger"><i class="far fa-trash-alt"></i></button>
+                              </form>
+                            </div>
+                          </div>
+                        </th>
+                      </tr>
+                      <?php } ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="RespuestaForm"></div>
+          <!-- /.row (main row) -->
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+  <?php require '../layout/footer.php'; ?>
+  <script src="<?php echo __SERVER__.__APP__; ?>estudiante.js"></script>  
+  <script src="<?php echo __SERVER__.__APP__; ?>main.js"></script>
+</body>
+</html>
+<?php ob_end_flush(); ?>

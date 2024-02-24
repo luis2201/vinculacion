@@ -1,0 +1,9 @@
+.vscode
+
+config/configDB.PHP
+config/mainModel.PHP
+
+PHPMailer/
+
+public/
+site/
